@@ -4437,13 +4437,17 @@ var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $author$project$Main$Controllable = {$: 'Controllable'};
 var $author$project$Main$initWorld = {
-	ship: {
-		behaviour: _List_fromArray(
-			[$author$project$Main$Controllable]),
-		location: _Utils_Tuple2(0, 0),
-		scale: 0.2,
-		sprite: '/assets/gfx/sprites/spaceship/fly.png'
-	}
+	objects: _List_fromArray(
+		[
+			{
+			behaviour: _List_fromArray(
+				[$author$project$Main$Controllable]),
+			location: _Utils_Tuple2(0, 0),
+			name: 'Spaceship',
+			scale: 0.2,
+			sprite: '/assets/gfx/sprites/spaceship/fly.png'
+		}
+		])
 };
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
@@ -4841,20 +4845,169 @@ var $elm$core$Result$isOk = function (result) {
 	}
 };
 var $elm$json$Json$Decode$succeed = _Json_succeed;
+var $elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							$elm$core$List$foldl,
+							fn,
+							acc,
+							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var $elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $author$project$Main$hasBehaviour = F2(
+	function (beh, obj) {
+		return A2($elm$core$List$member, beh, obj.behaviour);
+	});
+var $author$project$Main$behaving = F2(
+	function (beh, objs) {
+		return A2(
+			$elm$core$List$filter,
+			$author$project$Main$hasBehaviour(beh),
+			objs);
+	});
+var $elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						$elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
+var $author$project$Main$bound = F3(
+	function (w, _v0, x) {
+		var l = _v0.a;
+		var r = _v0.b;
+		var mx = (w / 2) - r;
+		var mn = ((-w) / 2) + l;
+		return (_Utils_cmp(x, mn) < 0) ? mn : ((_Utils_cmp(x, mx) > 0) ? mx : x);
+	});
 var $author$project$Main$boundX = F2(
 	function (w, x) {
-		var mx = (w / 2) - 200;
-		var m = ((-w) / 2) + 90;
-		return (_Utils_cmp(x, m) < 0) ? m : ((_Utils_cmp(x, mx) > 0) ? mx : x);
+		return A3(
+			$author$project$Main$bound,
+			w,
+			_Utils_Tuple2(90, 200),
+			x);
 	});
 var $author$project$Main$boundY = F2(
 	function (h, y) {
-		var mx = (h / 2) - 30;
-		var mn = ((-h) / 2) + 30;
-		return (_Utils_cmp(y, mn) < 0) ? mn : ((_Utils_cmp(y, mx) > 0) ? mx : y);
+		return A3(
+			$author$project$Main$bound,
+			h,
+			_Utils_Tuple2(30, 30),
+			y);
+	});
+var $elm$core$Debug$log = _Debug_log;
+var $author$project$Main$moveObject = F5(
+	function (obj, dx, dy, w, h) {
+		var _v0 = obj.location;
+		var x = _v0.a;
+		var y = _v0.b;
+		var loc = _Utils_Tuple2(
+			A2($author$project$Main$boundX, w, x + (2 * dx)),
+			A2($author$project$Main$boundY, h, y + (2 * dy)));
+		return A2(
+			$elm$core$Debug$log,
+			'moved OBJ',
+			_Utils_update(
+				obj,
+				{location: loc}));
 	});
 var $author$project$Gaming$toX = function (keyboard) {
 	return (keyboard.right ? 1 : 0) - (keyboard.left ? 1 : 0);
@@ -4864,25 +5017,20 @@ var $author$project$Gaming$toY = function (keyboard) {
 };
 var $author$project$Main$update = F2(
 	function (computer, world) {
-		var ship = world.ship;
-		var _v0 = world.ship.location;
-		var x = _v0.a;
-		var y = _v0.b;
-		var loc = _Utils_Tuple2(
-			A2(
-				$author$project$Main$boundX,
-				computer.screen.width,
-				x + (2 * $author$project$Gaming$toX(computer.keyboard))),
-			A2(
-				$author$project$Main$boundY,
-				computer.screen.height,
-				y + (2 * $author$project$Gaming$toY(computer.keyboard))));
-		var ship_ = _Utils_update(
-			ship,
-			{location: loc});
+		var w = computer.screen.width;
+		var objs = A2($author$project$Main$behaving, $author$project$Main$Controllable, world.objects);
+		var h = computer.screen.height;
+		var dy = $author$project$Gaming$toY(computer.keyboard);
+		var dx = $author$project$Gaming$toX(computer.keyboard);
+		var objs_ = A2(
+			$elm$core$List$map,
+			function (obj) {
+				return A5($author$project$Main$moveObject, obj, dx, dy, w, h);
+			},
+			world.objects);
 		return _Utils_update(
 			world,
-			{ship: ship_});
+			{objects: objs_});
 	});
 var $author$project$Gaming$Game = F3(
 	function (a, b, c) {
@@ -5064,75 +5212,6 @@ var $elm$core$Task$Perform = function (a) {
 };
 var $elm$core$Task$succeed = _Scheduler_succeed;
 var $elm$core$Task$init = $elm$core$Task$succeed(_Utils_Tuple0);
-var $elm$core$List$foldrHelper = F4(
-	function (fn, acc, ctr, ls) {
-		if (!ls.b) {
-			return acc;
-		} else {
-			var a = ls.a;
-			var r1 = ls.b;
-			if (!r1.b) {
-				return A2(fn, a, acc);
-			} else {
-				var b = r1.a;
-				var r2 = r1.b;
-				if (!r2.b) {
-					return A2(
-						fn,
-						a,
-						A2(fn, b, acc));
-				} else {
-					var c = r2.a;
-					var r3 = r2.b;
-					if (!r3.b) {
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(fn, c, acc)));
-					} else {
-						var d = r3.a;
-						var r4 = r3.b;
-						var res = (ctr > 500) ? A3(
-							$elm$core$List$foldl,
-							fn,
-							acc,
-							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(
-									fn,
-									c,
-									A2(fn, d, res))));
-					}
-				}
-			}
-		}
-	});
-var $elm$core$List$foldr = F3(
-	function (fn, acc, ls) {
-		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
-	});
-var $elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						$elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
 var $elm$core$Task$andThen = _Scheduler_andThen;
 var $elm$core$Task$map = F2(
 	function (func, taskA) {
@@ -6785,6 +6864,16 @@ var $author$project$Gaming$image = F3(
 			1,
 			A3($author$project$Gaming$Image, w, h, src));
 	});
+var $author$project$Gaming$move = F3(
+	function (dx, dy, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var a = _v0.c;
+		var s = _v0.d;
+		var o = _v0.e;
+		var f = _v0.f;
+		return A6($author$project$Gaming$Shape, x + dx, y + dy, a, s, o, f);
+	});
 var $author$project$Gaming$Rectangle = F3(
 	function (a, b, c) {
 		return {$: 'Rectangle', a: a, b: b, c: c};
@@ -6800,24 +6889,21 @@ var $author$project$Gaming$square = F2(
 			1,
 			A3($author$project$Gaming$Rectangle, color, n, n));
 	});
-var $author$project$Main$drawShip = function (ship) {
-	return $author$project$Gaming$group(
-		_List_fromArray(
-			[
-				A3($author$project$Gaming$image, 932 * ship.scale, 430 * ship.scale, ship.sprite),
-				A2($author$project$Gaming$square, $author$project$Gaming$green, 70)
-			]));
+var $author$project$Main$drawObject = function (obj) {
+	var _v0 = obj.location;
+	var x = _v0.a;
+	var y = _v0.b;
+	return A3(
+		$author$project$Gaming$move,
+		x,
+		y,
+		$author$project$Gaming$group(
+			_List_fromArray(
+				[
+					A3($author$project$Gaming$image, 932 * obj.scale, 430 * obj.scale, obj.sprite),
+					A2($author$project$Gaming$square, $author$project$Gaming$green, 70)
+				])));
 };
-var $author$project$Gaming$move = F3(
-	function (dx, dy, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var a = _v0.c;
-		var s = _v0.d;
-		var o = _v0.e;
-		var f = _v0.f;
-		return A6($author$project$Gaming$Shape, x + dx, y + dy, a, s, o, f);
-	});
 var $author$project$Gaming$rectangle = F3(
 	function (color, width, height) {
 		return A6(
@@ -6849,15 +6935,20 @@ var $author$project$Gaming$rgb = F3(
 			$author$project$Gaming$colorClamp(g),
 			$author$project$Gaming$colorClamp(b));
 	});
-var $author$project$Main$coords = function (_v0) {
-	var x = _v0.a;
-	var y = _v0.b;
-	return 'coords : (' + ($elm$core$String$fromFloat(x) + (',' + ($elm$core$String$fromFloat(y) + ')')));
-};
+var $author$project$Main$coords = F2(
+	function (label, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return label + (' : (' + ($elm$core$String$fromFloat(x) + (',' + ($elm$core$String$fromFloat(y) + ')'))));
+	});
 var $author$project$Main$screenInfo = F3(
 	function (computer, x, y) {
-		return $author$project$Main$coords(
-			_Utils_Tuple2(computer.screen.width, computer.screen.height)) + ('\n' + $author$project$Main$coords(
+		return A2(
+			$author$project$Main$coords,
+			'screen',
+			_Utils_Tuple2(computer.screen.width, computer.screen.height)) + ('; ' + A2(
+			$author$project$Main$coords,
+			'mouse',
 			_Utils_Tuple2(x, y)));
 	});
 var $author$project$Gaming$Words = F2(
@@ -6877,26 +6968,26 @@ var $author$project$Gaming$words = F2(
 	});
 var $author$project$Main$view = F2(
 	function (computer, world) {
-		var _v0 = world.ship.location;
-		var x = _v0.a;
-		var y = _v0.b;
-		return _List_fromArray(
-			[
-				A3(
-				$author$project$Gaming$rectangle,
-				A3($author$project$Gaming$rgb, 135, 135, 130),
-				computer.screen.width,
-				computer.screen.height),
-				A3(
-				$author$project$Gaming$move,
-				x,
-				y,
-				$author$project$Main$drawShip(world.ship)),
-				A2(
-				$author$project$Gaming$words,
-				$author$project$Gaming$black,
-				A3($author$project$Main$screenInfo, computer, x, y))
-			]);
+		var y = computer.mouse.y;
+		var x = computer.mouse.x;
+		return _Utils_ap(
+			_List_fromArray(
+				[
+					A3(
+					$author$project$Gaming$rectangle,
+					A3($author$project$Gaming$rgb, 135, 135, 130),
+					computer.screen.width,
+					computer.screen.height),
+					A3(
+					$author$project$Gaming$move,
+					0,
+					250,
+					A2(
+						$author$project$Gaming$words,
+						$author$project$Gaming$black,
+						A3($author$project$Main$screenInfo, computer, x, y)))
+				]),
+			A2($elm$core$List$map, $author$project$Main$drawObject, world.objects));
 	});
 var $author$project$Main$main = A3($author$project$Gaming$videogame, $author$project$Main$view, $author$project$Main$update, $author$project$Main$initWorld);
 _Platform_export({'Main':{'init':$author$project$Main$main(

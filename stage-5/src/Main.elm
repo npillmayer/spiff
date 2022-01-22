@@ -5,15 +5,15 @@ import Gaming exposing (..)
 
 main =
   videogame view update initWorld
-  --videogame view update (0,0)
 
 
 type alias World =
-  { ship : Ship
+  { objects : List Object
   }
 
-type alias Ship =
-  { location : (Float,Float)
+type alias Object =
+  { name : String
+  , location : (Float,Float)
   , sprite : String
   , scale : Float
   , behaviour : List Behaviour
@@ -26,41 +26,72 @@ type Behaviour
 
 initWorld : World
 initWorld =
-  { ship =
-    { location = (0, 0)
-    , sprite = "/assets/gfx/sprites/spaceship/fly.png"
-    , scale = 0.2
-    , behaviour = [ Controllable ]
-    }
+  { objects =
+    [ { name = "Spaceship"
+      , location = (0, 0)
+      , sprite = "/assets/gfx/sprites/spaceship/fly.png"
+      , scale = 0.2
+      , behaviour = [ Controllable ]
+      }
+    ]
   }
 
 -- UPDATE ----------------------------------------------------------
 
 update computer world =
   let
-    (x, y) = world.ship.location
-    --y = world.ship.location.y
-    loc = ( x + 2 *(toX computer.keyboard)
-          |> boundX computer.screen.width
-        , y + 2 * (toY computer.keyboard)
-          |> boundY computer.screen.height)
-    ship = world.ship
-    ship_ = { ship | location = loc }
-    in
-    { world | ship = ship_ }
+    dx = (toX computer.keyboard)
+    dy = (toY computer.keyboard)
+    w = computer.screen.width
+    h = computer.screen.height
+    objs = behaving Controllable world.objects
+    objs_ = List.map
+      (\obj -> moveObject obj dx dy w h)
+      world.objects  -- TODO
+  in
+    { world | objects = objs_ }
 
+
+behaving : Behaviour -> List Object -> List Object
+behaving beh objs =
+  List.filter (hasBehaviour beh) objs
+
+hasBehaviour : Behaviour -> Object -> Bool
+hasBehaviour beh obj =
+  List.member beh obj.behaviour
+
+
+moveObject obj dx dy w h =
+  let
+    (x, y) = obj.location
+    loc =
+      ( x + 2 * dx |> boundX w
+      , y + 2 * dy |> boundY h
+      )
+  in
+    Debug.log "moved OBJ" { obj | location = loc }
 
 -- VIEW ------------------------------------------------------------
 
 view computer world =
   let
-    (x, y) = world.ship.location
+    x = computer.mouse.x
+    y = computer.mouse.y
   in
-  [ rectangle (rgb 135 135 130) computer.screen.width computer.screen.height
-  , drawShip world.ship |> move x y
-  , words black (screenInfo computer x y)
-  ]
+    [ rectangle (rgb 135 135 130) computer.screen.width computer.screen.height
+    , words black (screenInfo computer x y) |> move 0 250
+    ]
+    ++ List.map drawObject world.objects
 
+
+drawObject obj =
+  let
+    (x, y) = obj.location
+  in
+    group
+      [ image (932 * obj.scale) (430 * obj.scale) obj.sprite
+      , square green 70
+      ] |> move x y
 
 drawShip ship =
   group
@@ -70,35 +101,25 @@ drawShip ship =
 
 
 boundX w x =
-  let
-    m = (-w / 2) + 90
-    mx = (w / 2) - 200
-  in
-  if x < m then
-    m
-  else if x > mx then
-    mx
-  else
-    x
+  bound w (90, 200) x
 
 boundY h y =
+  bound h (30, 30) y
+
+bound w (l, r) x =
   let
-    mn = (-h / 2) + 30
-    mx = (h / 2) - 30
+    mn = (-w / 2) + l
+    mx = (w / 2) - r
   in
-  if y < mn then
-    mn
-  else if y > mx then
-    mx
-  else
-    y
+  if x < mn then mn
+  else if x > mx then mx
+  else x
 
 
-coords (x,y) =
-  "coords : (" ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ ")"
-
+coords label (x,y) =
+  label ++ " : (" ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ ")"
 
 
 screenInfo computer x y =
-  (coords (computer.screen.width, computer.screen.height)) ++ "\n" ++
-    (coords (x,y))
+  (coords "screen" (computer.screen.width, computer.screen.height)) ++ "; " ++
+    (coords "mouse" (x,y))
