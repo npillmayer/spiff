@@ -4,24 +4,69 @@ import Gaming exposing (..)
 
 
 main =
-  videogame view update (0,0)
+  videogame view update initWorld
+  --videogame view update (0,0)
 
 
-view computer (x,y) =
+type alias World =
+  { ship : Ship
+  }
+
+type alias Ship =
+  { location : (Float,Float)
+  , sprite : String
+  , scale : Float
+  , behaviour : List Behaviour
+  }
+
+type Behaviour
+  = Controllable
+  | Collidable
+
+
+initWorld : World
+initWorld =
+  { ship =
+    { location = (0, 0)
+    , sprite = "/assets/gfx/sprites/spaceship/fly.png"
+    , scale = 0.2
+    , behaviour = [ Controllable ]
+    }
+  }
+
+-- UPDATE ----------------------------------------------------------
+
+update computer world =
+  let
+    (x, y) = world.ship.location
+    --y = world.ship.location.y
+    loc = ( x + 2 *(toX computer.keyboard)
+          |> boundX computer.screen.width
+        , y + 2 * (toY computer.keyboard)
+          |> boundY computer.screen.height)
+    ship = world.ship
+    ship_ = { ship | location = loc }
+    in
+    { world | ship = ship_ }
+
+
+-- VIEW ------------------------------------------------------------
+
+view computer world =
+  let
+    (x, y) = world.ship.location
+  in
   [ rectangle (rgb 135 135 130) computer.screen.width computer.screen.height
-  , square green 70 |> move x y
-  , spaceship 0.2 |> move x y
---  , words black (coords (x,y))
+  , drawShip world.ship |> move x y
   , words black (screenInfo computer x y)
   ]
 
 
-update computer (x,y) =
-  ( x + 2 *(toX computer.keyboard)
-    |> boundX computer.screen.width
-  , y + 2 * (toY computer.keyboard)
-    |> boundY computer.screen.height
-  )
+drawShip ship =
+  group
+    [ image (932 * ship.scale) (430 * ship.scale) ship.sprite
+    , square green 70
+    ]
 
 
 boundX w x =
@@ -52,9 +97,6 @@ boundY h y =
 coords (x,y) =
   "coords : (" ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ ")"
 
-
-spaceship scale =
-  image (932 * scale) (430 * scale) "/assets/gfx/sprites/spaceship/fly.png"
 
 
 screenInfo computer x y =

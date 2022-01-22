@@ -80,87 +80,6 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
 console.warn('Compiled in DEV mode. Follow the advice at https://elm-lang.org/0.19.1/optimize for better performance and smaller assets.');
 
 
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
-
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
-
-
-var _List_cons = F2(_List_Cons);
-
-function _List_fromArray(arr)
-{
-	var out = _List_Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = _List_Cons(arr[i], out);
-	}
-	return out;
-}
-
-function _List_toArray(xs)
-{
-	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		out.push(xs.a);
-	}
-	return out;
-}
-
-var _List_map2 = F3(function(f, xs, ys)
-{
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
-	{
-		arr.push(A2(f, xs.a, ys.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map3 = F4(function(f, xs, ys, zs)
-{
-	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A3(f, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map4 = F5(function(f, ws, xs, ys, zs)
-{
-	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
-{
-	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_sortBy = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
-	}));
-});
-
-var _List_sortWith = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = A2(f, a, b);
-		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
-	}));
-});
-
-
-
 var _JsArray_empty = [];
 
 function _JsArray_singleton(value)
@@ -790,6 +709,87 @@ function _Utils_ap(xs, ys)
 	}
 	return root;
 }
+
+
+
+var _List_Nil_UNUSED = { $: 0 };
+var _List_Nil = { $: '[]' };
+
+function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
+	}));
+});
 
 
 
@@ -4355,8 +4355,6 @@ function _Browser_load(url)
 		}
 	}));
 }
-var $elm$core$Basics$EQ = {$: 'EQ'};
-var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$List$cons = _List_cons;
 var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
 var $elm$core$Array$foldr = F3(
@@ -4434,7 +4432,19 @@ var $elm$core$Set$toList = function (_v0) {
 	var dict = _v0.a;
 	return $elm$core$Dict$keys(dict);
 };
+var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
+var $elm$core$Basics$LT = {$: 'LT'};
+var $author$project$Main$Controllable = {$: 'Controllable'};
+var $author$project$Main$initWorld = {
+	ship: {
+		behaviour: _List_fromArray(
+			[$author$project$Main$Controllable]),
+		location: _Utils_Tuple2(0, 0),
+		scale: 0.2,
+		sprite: '/assets/gfx/sprites/spaceship/fly.png'
+	}
+};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -4853,10 +4863,12 @@ var $author$project$Gaming$toY = function (keyboard) {
 	return (keyboard.up ? 1 : 0) - (keyboard.down ? 1 : 0);
 };
 var $author$project$Main$update = F2(
-	function (computer, _v0) {
+	function (computer, world) {
+		var ship = world.ship;
+		var _v0 = world.ship.location;
 		var x = _v0.a;
 		var y = _v0.b;
-		return _Utils_Tuple2(
+		var loc = _Utils_Tuple2(
 			A2(
 				$author$project$Main$boundX,
 				computer.screen.width,
@@ -4865,6 +4877,12 @@ var $author$project$Main$update = F2(
 				$author$project$Main$boundY,
 				computer.screen.height,
 				y + (2 * $author$project$Gaming$toY(computer.keyboard))));
+		var ship_ = _Utils_update(
+			ship,
+			{location: loc});
+		return _Utils_update(
+			world,
+			{ship: ship_});
 	});
 var $author$project$Gaming$Game = F3(
 	function (a, b, c) {
@@ -6735,10 +6753,61 @@ var $author$project$Gaming$Hex = function (a) {
 };
 var $author$project$Gaming$black = $author$project$Gaming$Hex('#000000');
 var $author$project$Gaming$green = $author$project$Gaming$Hex('#73d216');
+var $author$project$Gaming$Group = function (a) {
+	return {$: 'Group', a: a};
+};
 var $author$project$Gaming$Shape = F6(
 	function (a, b, c, d, e, f) {
 		return {$: 'Shape', a: a, b: b, c: c, d: d, e: e, f: f};
 	});
+var $author$project$Gaming$group = function (shapes) {
+	return A6(
+		$author$project$Gaming$Shape,
+		0,
+		0,
+		0,
+		1,
+		1,
+		$author$project$Gaming$Group(shapes));
+};
+var $author$project$Gaming$Image = F3(
+	function (a, b, c) {
+		return {$: 'Image', a: a, b: b, c: c};
+	});
+var $author$project$Gaming$image = F3(
+	function (w, h, src) {
+		return A6(
+			$author$project$Gaming$Shape,
+			0,
+			0,
+			0,
+			1,
+			1,
+			A3($author$project$Gaming$Image, w, h, src));
+	});
+var $author$project$Gaming$Rectangle = F3(
+	function (a, b, c) {
+		return {$: 'Rectangle', a: a, b: b, c: c};
+	});
+var $author$project$Gaming$square = F2(
+	function (color, n) {
+		return A6(
+			$author$project$Gaming$Shape,
+			0,
+			0,
+			0,
+			1,
+			1,
+			A3($author$project$Gaming$Rectangle, color, n, n));
+	});
+var $author$project$Main$drawShip = function (ship) {
+	return $author$project$Gaming$group(
+		_List_fromArray(
+			[
+				A3($author$project$Gaming$image, 932 * ship.scale, 430 * ship.scale, ship.sprite),
+				A2($author$project$Gaming$square, $author$project$Gaming$green, 70)
+			]));
+};
 var $author$project$Gaming$move = F3(
 	function (dx, dy, _v0) {
 		var x = _v0.a;
@@ -6748,10 +6817,6 @@ var $author$project$Gaming$move = F3(
 		var o = _v0.e;
 		var f = _v0.f;
 		return A6($author$project$Gaming$Shape, x + dx, y + dy, a, s, o, f);
-	});
-var $author$project$Gaming$Rectangle = F3(
-	function (a, b, c) {
-		return {$: 'Rectangle', a: a, b: b, c: c};
 	});
 var $author$project$Gaming$rectangle = F3(
 	function (color, width, height) {
@@ -6795,35 +6860,6 @@ var $author$project$Main$screenInfo = F3(
 			_Utils_Tuple2(computer.screen.width, computer.screen.height)) + ('\n' + $author$project$Main$coords(
 			_Utils_Tuple2(x, y)));
 	});
-var $author$project$Gaming$Image = F3(
-	function (a, b, c) {
-		return {$: 'Image', a: a, b: b, c: c};
-	});
-var $author$project$Gaming$image = F3(
-	function (w, h, src) {
-		return A6(
-			$author$project$Gaming$Shape,
-			0,
-			0,
-			0,
-			1,
-			1,
-			A3($author$project$Gaming$Image, w, h, src));
-	});
-var $author$project$Main$spaceship = function (scale) {
-	return A3($author$project$Gaming$image, 932 * scale, 430 * scale, '/assets/gfx/sprites/spaceship/fly.png');
-};
-var $author$project$Gaming$square = F2(
-	function (color, n) {
-		return A6(
-			$author$project$Gaming$Shape,
-			0,
-			0,
-			0,
-			1,
-			1,
-			A3($author$project$Gaming$Rectangle, color, n, n));
-	});
 var $author$project$Gaming$Words = F2(
 	function (a, b) {
 		return {$: 'Words', a: a, b: b};
@@ -6840,7 +6876,8 @@ var $author$project$Gaming$words = F2(
 			A2($author$project$Gaming$Words, color, string));
 	});
 var $author$project$Main$view = F2(
-	function (computer, _v0) {
+	function (computer, world) {
+		var _v0 = world.ship.location;
 		var x = _v0.a;
 		var y = _v0.b;
 		return _List_fromArray(
@@ -6854,22 +6891,13 @@ var $author$project$Main$view = F2(
 				$author$project$Gaming$move,
 				x,
 				y,
-				A2($author$project$Gaming$square, $author$project$Gaming$green, 70)),
-				A3(
-				$author$project$Gaming$move,
-				x,
-				y,
-				$author$project$Main$spaceship(0.2)),
+				$author$project$Main$drawShip(world.ship)),
 				A2(
 				$author$project$Gaming$words,
 				$author$project$Gaming$black,
 				A3($author$project$Main$screenInfo, computer, x, y))
 			]);
 	});
-var $author$project$Main$main = A3(
-	$author$project$Gaming$videogame,
-	$author$project$Main$view,
-	$author$project$Main$update,
-	_Utils_Tuple2(0, 0));
+var $author$project$Main$main = A3($author$project$Gaming$videogame, $author$project$Main$view, $author$project$Main$update, $author$project$Main$initWorld);
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
