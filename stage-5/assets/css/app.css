@@ -1,0 +1,15 @@
+body {
+  padding: 0;
+  margin: 0;
+}
+.bordered {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0;
+    margin-bottom: auto;
+    border: 5px solid #60b5cc;
+}
+.game {
+  max-width: 800px;
+  max-height: 600px:
+}
